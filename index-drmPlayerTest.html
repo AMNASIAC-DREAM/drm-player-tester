@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>dreamview-ott Keys Test - Verification Player</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.0/shaka-player.compiled.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 2px solid #0ff;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #0ff;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #0ff;
+        }
+        
+        .subtitle {
+            color: #ff0;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .test-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        .panel-header {
+            color: #0ff;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 0, 0.1);
+            border: 2px solid #ff0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .info-box h3 {
+            color: #ff0;
+            margin-bottom: 15px;
+        }
+        
+        .info-box ol {
+            margin-left: 25px;
+            color: #fff;
+        }
+        
+        .info-box strong {
+            color: #0ff;
+        }
+        
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-button {
+            flex: 1;
+            padding: 12px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #0ff;
+            border-radius: 8px;
+            color: #0ff;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-button.active {
+            background: rgba(0, 255, 255, 0.3);
+            border-color: #0f0;
+            color: #0f0;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .mode-button:hover:not(.active) {
+            background: rgba(0, 255, 255, 0.2);
+        }
+        
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group label {
+            color: #0ff;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .input-group input,
+        .input-group textarea {
+            background: #000;
+            color: #0f0;
+            border: 2px solid #0ff;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #0f0;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .input-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .toggle-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid #0ff;
+        }
+        
+        .toggle-label {
+            color: #0ff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #f00;
+            transition: .4s;
+            border-radius: 30px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #0f0;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        .toggle-status {
+            color: #0ff;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #0ff;
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 15px;
+            background: linear-gradient(135deg, #0ff 0%, #00a8cc 100%);
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000;
+            font-size: 15px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 255, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-test {
+            background: linear-gradient(135deg, #0f0 0%, #00aa00 100%);
+        }
+        
+        .btn-scan {
+            background: linear-gradient(135deg, #ff0 0%, #aaaa00 100%);
+            color: #000;
+        }
+        
+        .btn-normal {
+            background: linear-gradient(135deg, #f0f 0%, #aa00aa 100%);
+        }
+        
+        .btn-clear {
+            background: linear-gradient(135deg, #f00 0%, #aa0000 100%);
+        }
+        
+        .video-container {
+            background: #000;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #0ff;
+        }
+        
+        #video {
+            width: 100%;
+            background: #000;
+            border-radius: 10px;
+        }
+        
+        .status-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #0ff;
+            margin-bottom: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid #0ff;
+        }
+        
+        .status-label {
+            color: #aaa;
+            font-weight: bold;
+        }
+        
+        .status-value {
+            color: #0ff;
+            font-family: monospace;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .status-success {
+            border-left-color: #0f0;
+        }
+        
+        .status-success .status-value {
+            color: #0f0;
+        }
+        
+        .status-error {
+            border-left-color: #f00;
+        }
+        
+        .status-error .status-value {
+            color: #f00;
+        }
+        
+        .status-warning {
+            border-left-color: #ff0;
+        }
+        
+        .status-warning .status-value {
+            color: #ff0;
+        }
+        
+        .log-panel {
+            background: #000;
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        
+        .log-panel::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .log-panel::-webkit-scrollbar-track {
+            background: #000;
+        }
+        
+        .log-panel::-webkit-scrollbar-thumb {
+            background: #0ff;
+            border-radius: 5px;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-left: 3px solid;
+            padding-left: 12px;
+        }
+        
+        .log-info {
+            border-color: #0ff;
+            color: #0ff;
+        }
+        
+        .log-success {
+            border-color: #0f0;
+            color: #0f0;
+        }
+        
+        .log-error {
+            border-color: #f00;
+            color: #f00;
+        }
+        
+        .log-warning {
+            border-color: #ff0;
+            color: #ff0;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        
+        .comparison-table th {
+            background: rgba(0, 255, 255, 0.2);
+            color: #0ff;
+            font-weight: bold;
+        }
+        
+        .comparison-table tr:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .highlight {
+            color: #0f0;
+            font-weight: bold;
+        }
+        
+        .warning-text {
+            color: #ff0;
+            font-weight: bold;
+        }
+        
+        .keys-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .keys-display h4 {
+            color: #0ff;
+            margin-bottom: 10px;
+        }
+        
+        .keys-display pre {
+            color: #0f0;
+            font-family: monospace;
+            font-size: 12px;
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        @media (max-width: 1200px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            .button-group {
+                grid-template-columns: 1fr 1fr;
+            }
+            .mode-selector {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔬 dreamview-ott KEYS VERIFICATION TEST v2.0</h1>
+        <div class="subtitle">
+            Support MPD/M3U8 dengan/tanpa Token & Auto Scan KID/KEY
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Instructions -->
+        <div class="test-panel">
+            <div class="panel-header">
+                📋 Test Instructions
+            </div>
+            
+            <div class="info-box">
+                <h3>🎯 Objective:</h3>
+                <p>Verify if keys extracted by dreamview-ott can decrypt video content in clear keys mode.</p>
+                <br>
+                <h3>📝 Test Procedure:</h3>
+                <ol>
+                    <li><strong>Step 1:</strong> Pilih mode test (DRM atau Clear)</li>
+                    <li><strong>Step 2:</strong> Toggle ON jika guna Bearer Token, OFF jika tak perlu</li>
+                    <li><strong>Step 3:</strong> Paste MPD/M3U8 URL</li>
+                    <li><strong>Step 4:</strong> Jika token ON, paste Manifest Token</li>
+                    <li><strong>Step 5:</strong> Pilih salah satu:</li>
+                    <ul style="margin-left: 40px; margin-top: 5px;">
+                        <li>A) Scan auto KID/KEY dari URL</li>
+                        <li>B) Manual paste KID & KEY dari dreamview-ott</li>
+                    </ul>
+                    <li><strong>Step 6:</strong> Click test button</li>
+                    <li><strong>Step 7:</strong> Watch result!</li>
+                </ol>
+                <br>
+                <h3>⚠️ PENTING: Jika Content Tak Support DRM</h3>
+                <p>Jika URL tak support KID/KEY (biasa public/clear content), system akan auto detect dan beri warning!</p>
+            </div>
+        </div>
+        
+        <!-- Mode Selector -->
+        <div class="test-panel">
+            <div class="panel-header">
+                🎮 Test Mode Selection
+            </div>
+            
+            <div class="mode-selector">
+                <div class="mode-button active" id="modeDRM" onclick="selectMode('drm')">
+                    🔐 DRM Content Mode
+                    <div style="font-size: 12px; color: #aaa; margin-top: 5px;">Content dengan KID/KEY</div>
+                </div>
+                <div class="mode-button" id="modeClear" onclick="selectMode('clear')">
+                    📺 Clear Content Mode
+                    <div style="font-size: 12px; color: #aaa; margin-top: 5px;">Content tanpa DRM (public)</div>
+                </div>
+            </div>
+            
+            <div id="modeWarning" class="info-box" style="display: none; border-color: #ff0;">
+                <h3 style="color: #ff0;">⚠️ CLEAR CONTENT MODE</h3>
+                <p>Anda pilih mode CLEAR CONTENT. Content ini biasanya:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Tidak ada DRM protection</li>
+                    <li>Tidak perlu KID/KEY untuk decrypt</li>
+                    <li>Biasa format MP4 langsung atau HLS tanpa enkripsi</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>Jika content ni sebenarnya ada DRM, test akan gagal!</strong></p>
+            </div>
+        </div>
+        
+        <!-- Input Panel -->
+        <div class="test-panel">
+            <div class="panel-header">
+                ⚙️ Configuration
+            </div>
+            
+            <!-- Token Toggle -->
+            <div class="toggle-section">
+                <div class="toggle-label">Use Bearer Token:</div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="useTokenToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <div class="toggle-status" id="tokenStatus">ON</div>
+                <div style="color: #ff0; font-size: 12px; margin-left: auto;">
+                    ✅ ON jika content perlu token<br>
+                    ❌ OFF jika content free/clear
+                </div>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-group full-width">
+                    <label>📡 MPD/M3U8 URL:</label>
+                    <input 
+                        type="text" 
+                        id="mpdUrl" 
+                        placeholder="https://example.com/video.mpd atau .m3u8"
+                        value="https://vodc.conten.my/index.mpd"
+                    />
+                </div>
+                
+                <div class="input-group full-width" id="tokenGroup">
+                    <label>🎫 Manifest Token (Bearer):</label>
+                    <textarea 
+                        id="manifestToken" 
+                        placeholder="Paste Bearer token (without 'Bearer' prefix)"
+                    >eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOj.....</textarea>
+                </div>
+                
+                <div class="input-group" id="kidGroup">
+                    <label>🔑 KID (from dreamview-ott):</label>
+                    <input 
+                        type="text" 
+                        id="kid" 
+                        placeholder="af9xxxf2c1da5b63ac2xxxxxxxxxx"
+                        value="af9c9xxxc1da5b63acxxxxxxxxxx"
+                    />
+                </div>
+                
+                <div class="input-group" id="keyGroup">
+                    <label>🔐 KEY (from dreamview-ott):</label>
+                    <input 
+                        type="text" 
+                        id="key" 
+                        placeholder="5a5exxxxxxxf6f985378e0..."
+                        value="5a5e4axxxx6f985378e08b2...."
+                    />
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-test" onclick="testWithClearKeys()">
+                    🔬 Test with Keys
+                </button>
+                <button class="btn-scan" onclick="scanManifestForKeys()">
+                    🔍 Scan URL for Keys
+                </button>
+                <button class="btn-normal" onclick="testWithLicenseServer()">
+                    🔐 Test License Server
+                </button>
+                <button class="btn-clear" onclick="stopPlayback()">
+                    🛑 Stop Playback
+                </button>
+            </div>
+        </div>
+        
+        <!-- Auto Scan Results -->
+        <div class="test-panel" id="scanResults" style="display: none;">
+            <div class="panel-header">
+                🔍 Scan Results
+            </div>
+            <div id="scanContent"></div>
+        </div>
+        
+        <!-- Video Player -->
+        <div class="test-panel">
+            <div class="panel-header">
+                📺 Video Player
+            </div>
+            
+            <div class="video-container">
+                <video id="video" controls></video>
+            </div>
+        </div>
+        
+        <!-- Status Panel -->
+        <div class="test-panel">
+            <div class="panel-header">
+                📊 Test Results
+            </div>
+            
+            <div class="status-panel">
+                <div class="status-item" id="statusMode">
+                    <span class="status-label">Mode:</span>
+                    <span class="status-value">DRM Content Mode</span>
+                </div>
+                <div class="status-item" id="statusToken">
+                    <span class="status-label">Token Status:</span>
+                    <span class="status-value">ON</span>
+                </div>
+                <div class="status-item" id="statusKeys">
+                    <span class="status-label">Keys Status:</span>
+                    <span class="status-value">Not tested</span>
+                </div>
+                <div class="status-item" id="statusDRM">
+                    <span class="status-label">DRM Support:</span>
+                    <span class="status-value">Unknown</span>
+                </div>
+                <div class="status-item" id="statusPlayback">
+                    <span class="status-label">Playback:</span>
+                    <span class="status-value">Not started</span>
+                </div>
+                <div class="status-item" id="statusVerdict">
+                    <span class="status-label">Verdict:</span>
+                    <span class="status-value">Awaiting test...</span>
+                </div>
+            </div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Test Type</th>
+                        <th>Description</th>
+                        <th>What It Proves</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: #0f0;">DRM Mode</strong></td>
+                        <td>Content ada KID/KEY protection</td>
+                        <td>Jika works = Keys match dengan content</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #ff0;">Clear Mode</strong></td>
+                        <td>Content tanpa DRM (public)</td>
+                        <td>Video akan play tanpa KID/KEY</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: #f0f;">License Server</strong></td>
+                        <td>Normal DRM flow</td>
+                        <td>Standard playback (comparison)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Log Panel -->
+        <div class="test-panel">
+            <div class="panel-header">
+                📋 Test Logs
+            </div>
+            
+            <div class="log-panel" id="logOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        let player = null;
+        let currentMode = 'drm'; // 'drm' or 'clear'
+        
+        function addLog(message, type = 'info') {
+            const logOutput = document.getElementById('logOutput');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.innerHTML = `[${timestamp}] ${message}`;
+            logOutput.appendChild(entry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        function updateStatus(elementId, value, isSuccess = null) {
+            const element = document.getElementById(elementId);
+            const valueSpan = element.querySelector('.status-value');
+            valueSpan.textContent = value;
+            
+            // Reset semua status class
+            element.classList.remove('status-success', 'status-error', 'status-warning');
+            
+            if (isSuccess === true) {
+                element.classList.add('status-success');
+            } else if (isSuccess === false) {
+                element.classList.add('status-error');
+            } else if (isSuccess === 'warning') {
+                element.classList.add('status-warning');
+            }
+        }
+        
+        function cleanToken(token) {
+            return token.trim().replace(/^Bearer\s+/i, '');
+        }
+        
+        function selectMode(mode) {
+            currentMode = mode;
+            
+            // Update UI
+            document.getElementById('modeDRM').classList.toggle('active', mode === 'drm');
+            document.getElementById('modeClear').classList.toggle('active', mode === 'clear');
+            
+            const modeWarning = document.getElementById('modeWarning');
+            modeWarning.style.display = mode === 'clear' ? 'block' : 'none';
+            
+            const kidGroup = document.getElementById('kidGroup');
+            const keyGroup = document.getElementById('keyGroup');
+            
+            if (mode === 'clear') {
+                kidGroup.style.opacity = '0.5';
+                keyGroup.style.opacity = '0.5';
+                updateStatus('statusMode', 'Clear Content Mode (No DRM)', 'warning');
+                addLog('🎮 Mode switched to CLEAR CONTENT (no DRM)', 'warning');
+                addLog('   └─ KID/KEY fields disabled', 'info');
+                addLog('   └─ Expecting public/unencrypted content', 'info');
+            } else {
+                kidGroup.style.opacity = '1';
+                keyGroup.style.opacity = '1';
+                updateStatus('statusMode', 'DRM Content Mode (KID/KEY required)', 'success');
+                addLog('🎮 Mode switched to DRM CONTENT', 'info');
+                addLog('   └─ KID/KEY fields enabled', 'info');
+            }
+        }
+        
+        // Toggle token visibility
+        const useTokenToggle = document.getElementById('useTokenToggle');
+        const tokenGroup = document.getElementById('tokenGroup');
+        const tokenStatus = document.getElementById('tokenStatus');
+        
+        function updateTokenToggle() {
+            const isOn = useTokenToggle.checked;
+            tokenStatus.textContent = isOn ? 'ON' : 'OFF';
+            tokenStatus.style.color = isOn ? '#0f0' : '#f00';
+            
+            if (isOn) {
+                tokenGroup.style.display = 'flex';
+                updateStatus('statusToken', 'Token ON', true);
+            } else {
+                tokenGroup.style.display = 'none';
+                updateStatus('statusToken', 'Token OFF', 'warning');
+            }
+        }
+        
+        useTokenToggle.addEventListener('change', updateTokenToggle);
+        updateTokenToggle(); // Initial update
+        
+        // Scan manifest untuk cek jika ada DRM info
+        async function scanManifestForKeys() {
+            const mpdUrl = document.getElementById('mpdUrl').value.trim();
+            const useToken = document.getElementById('useTokenToggle').checked;
+            const manifestToken = useToken ? cleanToken(document.getElementById('manifestToken').value) : null;
+            
+            if (!mpdUrl) {
+                addLog('❌ ERROR: MPD/M3U8 URL required for scan!', 'error');
+                return;
+            }
+            
+            addLog('🔍 Scanning manifest for DRM information...', 'info');
+            addLog('═══════════════════════════════════════', 'info');
+            
+            try {
+                const response = await fetch(mpdUrl, {
+                    headers: useToken ? {
+                        'Authorization': 'Bearer ' + manifestToken,
+                        'Referer': 'http://localhost/',
+                        'Origin': 'http://localhost'
+                    } : {
+                        'Referer': 'http://localhost/',
+                        'Origin': 'http://localhost'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const manifestText = await response.text();
+                addLog('✅ Manifest fetched successfully', 'success');
+                
+                // Parse manifest untuk cek DRM info
+                let hasDRM = false;
+                let drmSystemId = null;
+                let psshData = null;
+                let keyIds = [];
+                
+                // Check for Widevine/PlayReady PSSH
+                const psshMatch = manifestText.match(/<cenc:pssh[^>]*>([^<]+)<\/cenc:pssh>/i);
+                if (psshMatch) {
+                    hasDRM = true;
+                    psshData = psshMatch[1];
+                    addLog('🔐 DRM detected: PSSH data found', 'warning');
+                    
+                    // Try to extract system ID
+                    if (psshData.includes('edef8ba9')) {
+                        drmSystemId = 'Widevine (edef8ba9-79d6-4ace-a3c8-27dcd51d21ed)';
+                    } else if (psshData.includes('9a04f079')) {
+                        drmSystemId = 'PlayReady (9a04f079-9840-4286-ab92-e65be0885f95)';
+                    }
+                    
+                    if (drmSystemId) {
+                        addLog(`   └─ System ID: ${drmSystemId}`, 'info');
+                    }
+                }
+                
+                // Check for ContentProtection elements in DASH
+                const cpMatch = manifestText.match(/<ContentProtection[^>]*schemeIdUri="([^"]+)"[^>]*>/g);
+                if (cpMatch) {
+                    hasDRM = true;
+                    addLog('🔐 DRM detected: ContentProtection elements found', 'warning');
+                    cpMatch.forEach((cp, index) => {
+                        addLog(`   ${index + 1}. ${cp.substring(0, 100)}...`, 'info');
+                    });
+                }
+                
+                // Check for EXT-X-KEY in HLS
+                const extXKeyMatch = manifestText.match(/#EXT-X-KEY:[^\n]+/g);
+                if (extXKeyMatch) {
+                    hasDRM = true;
+                    addLog('🔐 DRM detected: EXT-X-KEY tags found (HLS)', 'warning');
+                    extXKeyMatch.forEach((key, index) => {
+                        addLog(`   ${index + 1}. ${key}`, 'info');
+                    });
+                }
+                
+                // Check for ClearKey
+                const clearkeyMatch = manifestText.match(/schemeIdUri="urn:uuid:1077efec-c0b2-4d02-ace3-3c1e52e2fb4b"/i);
+                if (clearkeyMatch) {
+                    hasDRM = true;
+                    addLog('🔐 DRM detected: ClearKey scheme (KID/KEY expected)', 'warning');
+                }
+                
+                // Update UI dengan scan results
+                const scanResults = document.getElementById('scanResults');
+                const scanContent = document.getElementById('scanContent');
+                
+                let scanHTML = '';
+                
+                if (hasDRM) {
+                    scanHTML = `
+                        <div style="background: rgba(255, 0, 0, 0.1); border: 2px solid #f00; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                            <h3 style="color: #f00;">⚠️ DRM PROTECTION DETECTED</h3>
+                            <p>Content ini ada DRM protection. Anda perlukan KID & KEY yang betul untuk decrypt.</p>
+                        </div>
+                        <div class="keys-display">
+                            <h4>🔍 DRM Information Found:</h4>
+                            <pre>${manifestText.substring(0, 1000)}...</pre>
+                        </div>
+                        <div style="color: #ff0; margin-top: 15px;">
+                            <strong>Next Step:</strong> Paste KID & KEY dari dreamview-ott ke field di atas
+                        </div>
+                    `;
+                    updateStatus('statusDRM', 'DRM Protected - KID/KEY Required', false);
+                    updateStatus('statusMode', 'DRM Content Mode (Confirmed)', false);
+                    
+                    addLog('', 'warning');
+                    addLog('═══════════════════════════════════════', 'warning');
+                    addLog('🔍 SCAN RESULT: DRM DETECTED!', 'warning');
+                    addLog('❌ Content ini ada DRM protection', 'warning');
+                    addLog('✅ Anda perlukan KID/KEY yang betul', 'warning');
+                    addLog('═══════════════════════════════════════', 'warning');
+                } else {
+                    scanHTML = `
+                        <div style="background: rgba(0, 255, 0, 0.1); border: 2px solid #0f0; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                            <h3 style="color: #0f0;">✅ NO DRM DETECTED</h3>
+                            <p>Content ini TIDAK ada DRM protection. Mungkin public/clear content.</p>
+                            <p><strong>Suggestion:</strong> Switch ke CLEAR CONTENT MODE untuk test.</p>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button onclick="selectMode('clear')" style="background: #0f0; color: black; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                                🎮 Switch to Clear Mode
+                            </button>
+                            <button onclick="document.getElementById('kid').value = ''; document.getElementById('key').value = ''; addLog('KID/KEY fields cleared for clear content test', 'info');" style="background: #ff0; color: black; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                                🧹 Clear KID/KEY Fields
+                            </button>
+                        </div>
+                    `;
+                    updateStatus('statusDRM', 'No DRM - Clear Content', true);
+                    updateStatus('statusMode', 'Clear Content (No DRM)', 'warning');
+                    
+                    addLog('', 'success');
+                    addLog('═══════════════════════════════════════', 'success');
+                    addLog('🔍 SCAN RESULT: NO DRM DETECTED', 'success');
+                    addLog('✅ Content ini mungkin public/clear', 'success');
+                    addLog('🎮 Consider switching to CLEAR CONTENT MODE', 'success');
+                    addLog('═══════════════════════════════════════', 'success');
+                }
+                
+                scanContent.innerHTML = scanHTML;
+                scanResults.style.display = 'block';
+                
+            } catch (error) {
+                addLog(`❌ Scan failed: ${error.message}`, 'error');
+                updateStatus('statusDRM', 'Scan Failed', false);
+                
+                const scanResults = document.getElementById('scanResults');
+                const scanContent = document.getElementById('scanContent');
+                
+                scanContent.innerHTML = `
+                    <div style="background: rgba(255, 0, 0, 0.1); border: 2px solid #f00; border-radius: 10px; padding: 15px;">
+                        <h3 style="color: #f00;">❌ SCAN FAILED</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Possible reasons:</p>
+                        <ul>
+                            <li>URL tidak valid</li>
+                            <li>Token salah/expired (jika guna token)</li>
+                            <li>Network error</li>
+                            <li>CORS restriction</li>
+                        </ul>
+                    </div>
+                `;
+                scanResults.style.display = 'block';
+            }
+        }
+        
+        async function testWithClearKeys() {
+            addLog('🔬 Starting Test...', 'info');
+            addLog('═══════════════════════════════════════', 'info');
+            
+            // Get values
+            const mpdUrl = document.getElementById('mpdUrl').value.trim();
+            const useToken = document.getElementById('useTokenToggle').checked;
+            const manifestToken = useToken ? cleanToken(document.getElementById('manifestToken').value) : null;
+            const kid = document.getElementById('kid').value.trim();
+            const key = document.getElementById('key').value.trim();
+            
+            // Validate
+            if (!mpdUrl) {
+                addLog('❌ ERROR: MPD/M3U8 URL required!', 'error');
+                updateStatus('statusVerdict', 'FAILED: Missing URL', false);
+                return;
+            }
+            
+            if (currentMode === 'drm') {
+                if (!kid || !key) {
+                    addLog('❌ ERROR: KID and KEY required for DRM mode!', 'error');
+                    updateStatus('statusVerdict', 'FAILED: Missing KID/KEY', false);
+                    return;
+                }
+            }
+            
+            if (useToken && !manifestToken) {
+                addLog('❌ ERROR: Token is enabled but empty!', 'error');
+                updateStatus('statusVerdict', 'FAILED: Missing token', false);
+                return;
+            }
+            
+            addLog(`📡 MPD/M3U8 URL: ${mpdUrl}`, 'info');
+            addLog(`🎮 Current Mode: ${currentMode === 'drm' ? 'DRM' : 'CLEAR'}`, 'info');
+            addLog(`🔐 Token Mode: ${useToken ? 'ON' : 'OFF'}`, 'info');
+            
+            if (currentMode === 'drm') {
+                addLog(`🔑 KID: ${kid}`, 'info');
+                addLog(`🔐 KEY: ${key}`, 'info');
+                updateStatus('statusKeys', `${kid}:${key}`, null);
+            } else {
+                addLog('🔑 KID/KEY: Not required (Clear Mode)', 'info');
+                updateStatus('statusKeys', 'Not required (Clear Mode)', 'warning');
+            }
+            
+            updateStatus('statusMode', currentMode === 'drm' ? 'DRM Content Mode' : 'Clear Content Mode', 
+                        currentMode === 'drm' ? true : 'warning');
+            
+            // Initialize Shaka
+            addLog('📦 Initializing Shaka Player...', 'info');
+            shaka.polyfill.installAll();
+            
+            if (!shaka.Player.isBrowserSupported()) {
+                addLog('❌ Browser not supported!', 'error');
+                updateStatus('statusVerdict', 'FAILED: Browser not supported', false);
+                return;
+            }
+            
+            addLog('✅ Browser supports Shaka Player', 'success');
+            
+            // Destroy existing player
+            if (player) {
+                addLog('🔄 Destroying existing player...', 'info');
+                await player.destroy();
+            }
+            
+            // Create player
+            addLog('🎬 Creating player instance...', 'info');
+            const video = document.getElementById('video');
+            player = new shaka.Player(video);
+            
+            // Configure berdasarkan mode
+            if (currentMode === 'drm') {
+                addLog('⚙️ Configuring player with CLEAR KEYS...', 'warning');
+                addLog('   └─ Bypassing license server!', 'warning');
+                addLog(`   └─ Using dreamview-ott keys directly! ${useToken ? '(with token)' : '(without token)'}`, 'warning');
+                
+                player.configure({
+                    drm: {
+                        clearKeys: {
+                            [kid]: key
+                        }
+                    }
+                });
+                
+                addLog('✅ Clear keys configured!', 'success');
+                addLog(`   └─ KID: ${kid}`, 'info');
+                addLog(`   └─ KEY: ${key}`, 'info');
+            } else {
+                addLog('⚙️ Configuring player for CLEAR CONTENT...', 'info');
+                addLog('   └─ No DRM configuration needed', 'info');
+                addLog('   └─ Expecting unencrypted stream', 'info');
+                
+                // No DRM config needed for clear content
+            }
+            
+            // Register request filter untuk token jika perlu
+            if (useToken) {
+                player.getNetworkingEngine().registerRequestFilter((type, request) => {
+                    if (type === shaka.net.NetworkingEngine.RequestType.MANIFEST ||
+                        type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
+                        request.headers['Authorization'] = 'Bearer ' + manifestToken;
+                        request.headers['Referer'] = 'http://localhost/';
+                        request.headers['Origin'] = 'http://localhost';
+                    }
+                });
+                addLog('✅ Bearer token configured for requests', 'success');
+            } else {
+                addLog('ℹ️ No token configured - assuming public content', 'info');
+            }
+            
+            // Error handling
+            player.addEventListener('error', (event) => {
+                const error = event.detail;
+                addLog(`❌ PLAYER ERROR: ${error.message}`, 'error');
+                addLog(`   └─ Code: ${error.code}`, 'error');
+                addLog(`   └─ Category: ${error.category}`, 'error');
+                
+                updateStatus('statusPlayback', 'FAILED', false);
+                
+                if (currentMode === 'drm') {
+                    updateStatus('statusVerdict', '❌ FAILED: Keys tidak match atau DRM error!', false);
+                    addLog('', 'error');
+                    addLog('═══════════════════════════════════════', 'error');
+                    addLog('🔍 CONCLUSION:', 'error');
+                    addLog('❌ dreamview-ott keys TIDAK compatible!', 'error');
+                    addLog('❌ Possible reasons:', 'error');
+                    addLog('   • Wrong KID/KEY', 'error');
+                    addLog('   • Different content/session', 'error');
+                    addLog('   • Keys expired', 'error');
+                    addLog('   • DRM mismatch', 'error');
+                    addLog('═══════════════════════════════════════', 'error');
+                } else {
+                    updateStatus('statusVerdict', '❌ FAILED: Content mungkin ada DRM!', false);
+                    addLog('', 'error');
+                    addLog('═══════════════════════════════════════', 'error');
+                    addLog('🔍 CONCLUSION:', 'error');
+                    addLog('❌ Clear mode failed! Content mungkin ada DRM', 'error');
+                    addLog('✅ Suggestion: Switch to DRM mode & provide KID/KEY', 'error');
+                    addLog('═══════════════════════════════════════', 'error');
+                }
+            });
+            
+            // Load video
+            try {
+                addLog('⏳ Loading manifest and initializing stream...', 'info');
+                updateStatus('statusPlayback', 'Loading...', null);
+                
+                await player.load(mpdUrl);
+                
+                addLog('', 'success');
+                addLog('═══════════════════════════════════════', 'success');
+                
+                if (currentMode === 'drm') {
+                    addLog('🎉 SUCCESS! Video loaded with clear keys!', 'success');
+                    addLog(`▶️ Starting playback... ${useToken ? '(with token)' : '(without token)'}`, 'success');
+                    updateStatus('statusVerdict', '✅ SUCCESS: Keys CORRECT!', true);
+                    updateStatus('statusDRM', 'DRM Decrypted Successfully', true);
+                } else {
+                    addLog('🎉 SUCCESS! Clear content loaded!', 'success');
+                    addLog('▶️ Starting playback... (no DRM)', 'success');
+                    updateStatus('statusVerdict', '✅ SUCCESS: Clear content plays!', true);
+                    updateStatus('statusDRM', 'No DRM - Plays Normally', true);
+                }
+                
+                video.play();
+                
+                addLog('✅ Video is playing!', 'success');
+                addLog('═══════════════════════════════════════', 'success');
+                addLog('', 'success');
+                addLog('🔍 CONCLUSION:', 'success');
+                
+                if (currentMode === 'drm') {
+                    addLog('✅ dreamview-ott keys CORRECT! ✅', 'success');
+                    addLog(`✅ Keys dapat decrypt content ni ${useToken ? 'with token' : 'without token'}!`, 'success');
+                    addLog('✅ This PROVES: dreamview-ott capture keys berfungsi!', 'success');
+                } else {
+                    addLog('✅ Content is CLEAR (no DRM) ✅', 'success');
+                    addLog('✅ Plays without any KID/KEY', 'success');
+                    addLog('✅ dreamview-ott not needed for this content', 'success');
+                }
+                
+                addLog('═══════════════════════════════════════', 'success');
+                
+                updateStatus('statusPlayback', 'Playing Successfully! ✅', true);
+                
+            } catch (error) {
+                addLog(`❌ Load failed: ${error.message}`, 'error');
+                updateStatus('statusPlayback', 'Failed', false);
+                updateStatus('statusVerdict', '❌ FAILED: Could not load video', false);
+            }
+        }
+        
+        async function testWithLicenseServer() {
+            addLog('🔐 Starting Normal DRM Test (License Server)...', 'info');
+            addLog('═══════════════════════════════════════', 'info');
+            
+            const mpdUrl = document.getElementById('mpdUrl').value.trim();
+            const useToken = document.getElementById('useTokenToggle').checked;
+            const manifestToken = useToken ? cleanToken(document.getElementById('manifestToken').value) : null;
+            
+            if (!mpdUrl) {
+                addLog('❌ ERROR: MPD/M3U8 URL required!', 'error');
+                return;
+            }
+            
+            if (useToken && !manifestToken) {
+                addLog('❌ ERROR: Token is enabled but empty!', 'error');
+                return;
+            }
+            
+            updateStatus('statusMode', 'License Server Mode (Normal DRM)', true);
+            updateStatus('statusToken', useToken ? 'Token ON' : 'Token OFF', useToken ? true : 'warning');
+            updateStatus('statusKeys', 'From license server', null);
+            
+            addLog('📦 Initializing Shaka Player...', 'info');
+            shaka.polyfill.installAll();
+            
+            if (!shaka.Player.isBrowserSupported()) {
+                addLog('❌ Browser not supported!', 'error');
+                return;
+            }
+            
+            if (player) {
+                await player.destroy();
+            }
+            
+            const video = document.getElementById('video');
+            player = new shaka.Player(video);
+            
+            // Extract content ID from URL
+            const contentIdMatch = mpdUrl.match(/\/([a-f0-9-]+)\/[a-f0-9-]+\/index\.mpd/);
+            const contentId = contentIdMatch ? contentIdMatch[1] : 'unknown';
+            
+            addLog(`🔍 Detected content ID: ${contentId}`, 'info');
+            addLog(`ℹ️ Token mode: ${useToken ? 'With token' : 'Without token'}`, 'info');
+            
+            if (!useToken) {
+                addLog('⚠️ Note: License server test tanpa token mungkin gagal!', 'warning');
+            }
+            
+            // Configure with license server
+            player.configure({
+                drm: {
+                    servers: {
+                        'com.widevine.alpha': `https://license.ctrp.astro.com.my/licenseServer/widevine/v1/astro/license?contentId=${contentId}`
+                    }
+                }
+            });
+            
+            player.getNetworkingEngine().registerRequestFilter((type, request) => {
+                if (type === shaka.net.NetworkingEngine.RequestType.MANIFEST ||
+                    type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
+                    if (useToken) {
+                        request.headers['Authorization'] = 'Bearer ' + manifestToken;
+                    }
+                    request.headers['Referer'] = 'http://localhost/';
+                    request.headers['Origin'] = 'http://localhost';
+                }
+                
+                if (type === shaka.net.NetworkingEngine.RequestType.LICENSE) {
+                    addLog('⚠️ License request detected', 'warning');
+                    request.headers['Referer'] = 'http://localhost/';
+                    request.headers['Origin'] = 'http://localhost';
+                }
+            });
+            
+            player.addEventListener('error', (event) => {
+                const error = event.detail;
+                addLog(`❌ ERROR: ${error.message}`, 'error');
+                updateStatus('statusPlayback', 'Failed', false);
+            });
+            
+            try {
+                addLog('⏳ Loading with license server...', 'info');
+                updateStatus('statusPlayback', 'Loading...', null);
+                
+                await player.load(mpdUrl);
+                
+                addLog('✅ Loaded successfully with license server!', 'success');
+                video.play();
+                
+                updateStatus('statusPlayback', 'Playing with license server', true);
+                
+            } catch (error) {
+                addLog(`❌ Failed: ${error.message}`, 'error');
+                if (!useToken) {
+                    addLog('ℹ️ Expected - content mungkin perlukan token', 'info');
+                }
+            }
+        }
+        
+        async function stopPlayback() {
+            if (player) {
+                addLog('🛑 Stopping playback...', 'info');
+                await player.destroy();
+                player = null;
+                document.getElementById('video').src = '';
+                addLog('✅ Playback stopped', 'success');
+                
+                updateStatus('statusMode', 'Stopped', null);
+                updateStatus('statusPlayback', 'Stopped', null);
+            }
+        }
+        
+        // Initial log
+        addLog('🔬 dreamview-ott Keys Verification Test v2.0 initialized', 'info');
+        addLog('📝 Ready to test MPD/M3U8 dengan auto DRM detection!', 'info');
+        addLog('', 'info');
+        addLog('💡 New Features:', 'info');
+        addLog('   1. DRM vs Clear Content mode selection', 'info');
+        addLog('   2. Auto scan untuk detect DRM protection', 'info');
+        addLog('   3. Smart KID/KEY field management', 'info');
+        addLog('   4. Better error messages for DRM issues', 'info');
+        addLog('═══════════════════════════════════════', 'info');
+        
+        // Initialize dengan DRM mode
+        selectMode('drm');
+    </script>
+</body>
+</html>
